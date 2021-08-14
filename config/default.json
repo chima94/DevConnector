@@ -1,4 +1,3 @@
 {
-    "mongoURI": "mongodb+srv://chima:chimanwakis94@devconnector.oaweu.mongodb.net/Devconnector?retryWrites=true&w=majority",
-    "jwtSecret": "mysecrettoken"
+    
 }
