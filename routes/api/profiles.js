@@ -5,6 +5,7 @@ const{body, validationResult} = require('express-validator')
 const Profile = require('../../models/Profile')
 const auth = require('../../middleware/auth')
 const User = require('../../models/User')
+const Post = require('../../models/Post')
 const router = express()
 
 //@route GET api/Profile/me
@@ -72,12 +73,12 @@ router.post(
         }
 
         //build social object
-        profileFields.socials = {}
-        if(youtube) profileFields.socials.youtube = youtube
-        if(facebook) profileFields.socials.youtube = facebook
-        if(twitter) profileFields.socials.twitter = twitter
-        if(instagram) profileFields.socials.instagram = instagram
-        if(linkedin) profileFields.socials.linkedin = linkedin
+        profileFields.social = {}
+        if(youtube) profileFields.social.youtube = youtube
+        if(facebook) profileFields.social.facebook = facebook
+        if(twitter) profileFields.social.twitter = twitter
+        if(instagram) profileFields.social.instagram = instagram
+        if(linkedin) profileFields.social.linkedin = linkedin
         
         try{
             let profile = await Profile.findOne({user: req.user.id})
@@ -145,9 +146,19 @@ router.get('/user/:user_id', async (req, res) =>{
 //desc  delete profile, user and posts
 //Access Private
 router.delete('/', auth, async (req, res) =>{
-    await Profile.findOneAndRemove({user: req.user.id})
-    await User.findOneAndRemove({_id: req.user.id})
-    res.json({msg: 'User deleted'})
+    try {
+        //delete user post
+        await Post.deleteMany({user: req.user.id})
+
+        //delete user profile
+        await Profile.findOneAndRemove({user: req.user.id})
+
+        //delete user
+        await User.findOneAndRemove({_id: req.user.id})
+        res.json({msg: 'User deleted'}) 
+    } catch (error) {
+        res.status(500).send('Server Error')
+    }
 })
 
 
