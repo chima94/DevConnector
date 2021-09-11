@@ -40,45 +40,46 @@ router.post(
     async (req, res) =>{
 
         const errors = validationResult(req)
+        
         if(!errors.isEmpty()){
             return res.status(400).json({errors: errors.array()})
         }
+        
 
-        const {
-            company,
-            website,
-            location,
-            bio,
-            status,
-            githubusername,
-            skills,
-            youtube,
-            facebook,
-            twitter,
-            instagram,
-            linkedin
-        } = req.body
-
-        //build profile object
-        const profileFields = {}
-        profileFields.user = req.user.id
-        if(company) profileFields.company = company
-        if(website) profileFields.website = website
-        if(location) profileFields.location = location
-        if(bio) profileFields.bio = bio
-        if(status) profileFields.status = status
-        if(githubusername) profileFields.githubusername = githubusername
-        if(skills){
-            profileFields.skills = skills.split(',').map(skill => skill.trim())
-        }
+        // destructure the request
+    const {
+        website,
+        skills,
+        youtube,
+        twitter,
+        instagram,
+        linkedin,
+        facebook,
+        // spread the rest of the fields we don't need to check
+        ...rest
+      } = req.body;
+  
+      // build a profile
+      const profileFields = {
+        user: req.user.id,
+        website:
+          website && website !== ''
+            ? normalize(website, { forceHttps: true })
+            : '',
+        skills: Array.isArray(skills)
+          ? skills
+          : skills.split(',').map((skill) => ' ' + skill.trim()),
+        ...rest
+      };
 
         //build social object
-        profileFields.social = {}
-        if(youtube) profileFields.social.youtube = youtube
-        if(facebook) profileFields.social.facebook = facebook
-        if(twitter) profileFields.social.twitter = twitter
-        if(instagram) profileFields.social.instagram = instagram
-        if(linkedin) profileFields.social.linkedin = linkedin
+        const socialFields = {youtube, twitter, instagram, linkedin, facebook}
+        for(const [key, value] of Object.entries(socialFields)){
+            if(value && value.length > 0)
+                socialFields[key] = normalize(value, { forceHttps: true });
+        }
+
+        profileFields.social = socialFields;
         
         try{
             let profile = await Profile.findOne({user: req.user.id})

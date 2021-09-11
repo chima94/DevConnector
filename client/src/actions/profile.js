@@ -18,6 +18,7 @@ export const getCurrentProfile = () => async (dispatch) =>{
             payload: res.data
         })
     } catch (error) {
+        dispatch({ type: CLEAR_PROFILE });
         dispatch({
             type: PROFILE_ERROR,
             payload: {msg: error.response.statusText, status: error.response.status}
@@ -66,10 +67,10 @@ export const getProfileById = userId => async (dispatch) =>{
 
 
 //get github repos
-export const getGithubRepos = username => async (dispatch) =>{
-
+export const getGithubRepos = (username) => async (dispatch) =>{
     try {
-        const res = axios.get(`/api/profiles/github/${username}`)
+        const res = await axios.get(`/api/profiles/github/${username}`)
+    
         dispatch({
             type: GET_REPOS,
             payload: res.data
@@ -91,7 +92,9 @@ export const createProfile = (formData, history, edit = false) => async dispatch
                 'Content-Type': 'application/json'
             }
         }
+    
         const res = await axios.post('/api/profiles', formData, config)
+    
         dispatch({
             type: GET_PROFILE,
             payload: res.data
