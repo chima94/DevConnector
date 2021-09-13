@@ -1,6 +1,3 @@
 {
-    "mongoURI": "mongodb+srv://chima:chimanwakis94@devconnector.oaweu.mongodb.net/Devconnector?retryWrites=true&w=majority",
-    "jwtSecret": "mysecrettoken",
-    "githubClientId":"d4837a6fc57729b74d34",
-    "githubClientSecret":"44326075dce7d503d7f16b4e8a68910cec405977"
+    
 }
